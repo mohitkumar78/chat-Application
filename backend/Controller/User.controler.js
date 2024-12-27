@@ -5,7 +5,7 @@ export const register = async (req, res) => {
     try {
         console.log("req is come")
         const { email, password } = req.body;
-
+        console.log(email, password)
         // Validate input
         if (!email || !password) {
             return res.status(400).json({
@@ -15,6 +15,7 @@ export const register = async (req, res) => {
 
         // Check if the user already exists
         const existingUser = await userdata.findOne({ email });
+        console.log(existingUser)
         if (existingUser) {
             return res.status(400).json({
                 message: "User already exists with this email.",
@@ -26,7 +27,7 @@ export const register = async (req, res) => {
 
         // Create new user
         const newUser = await userdata.create({ email, password: hashPassword });
-        console.log(newUser)
+        console.log("new user", newUser)
         // Respond with success message
         return res.status(201).json({
             message: "User registered successfully.",
@@ -80,7 +81,8 @@ export const login = async (req, res) => {
         return res.status(200).json({
             message: "User login successfully",
             token,
-            user
+            user,
+            prfilesetup: user.prfilesetup
         });
     } catch (error) {
         return res.status(500).json({

@@ -4,53 +4,76 @@ import login from "../assets/login2.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Auth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const { email, password, confirmPassword } = formData;
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    if (!email || !password || !confirmPassword) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    if (confirmPassword !== password) {
+      toast.error("Password and Confirm Password must match");
+      return;
+    }
+
     try {
       const res = await axios.post(
         "http://localhost:4000/api/v1/user/register",
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
       );
-      console.log(res);
+      if (res) {
+        toast.success(res.data.message || "Signup successful");
+        navigate("/profile");
+      }
     } catch (error) {
-      console.log("error is occur in register");
+      toast.error(error.response?.data?.message || "Error during signup");
     }
   };
 
   const loginHandler = async (e) => {
     e.preventDefault();
 
+    if (!email || !password) {
+      toast.error("All fields are required");
+      return;
+    }
+
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         "http://localhost:4000/api/v1/user/login",
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
       );
-      console.log(response);
+      if (res) {
+        toast.success(res.data.message || "Login successful");
+        navigate("/profile");
+      }
     } catch (error) {
-      console.log("error in login ");
+      toast.error(error.response?.data?.message || "Error during login");
     }
   };
 
@@ -101,17 +124,19 @@ function Auth() {
                 <div className="flex flex-col items-center space-y-4">
                   <Input
                     type="email"
+                    name="email"
                     placeholder="Enter your email"
                     className="w-full px-6 py-3 rounded-full"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleChange}
                   />
                   <Input
                     type="password"
+                    name="password"
                     placeholder="Enter your password"
                     className="w-full px-6 py-3 rounded-full"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handleChange}
                   />
                   <Button
                     type="submit"
@@ -132,28 +157,31 @@ function Auth() {
                 <div className="flex flex-col items-center space-y-4">
                   <Input
                     type="email"
+                    name="email"
                     placeholder="Enter your email"
                     className="w-full px-6 py-3 rounded-full"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleChange}
                   />
                   <Input
                     type="password"
+                    name="password"
                     placeholder="Enter your password"
                     className="w-full px-6 py-3 rounded-full"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handleChange}
                   />
                   <Input
                     type="password"
+                    name="confirmPassword"
                     placeholder="Confirm password"
                     className="w-full px-6 py-3 rounded-full"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={handleChange}
                   />
                   <Button
                     type="submit"
-                    className="w-full py-3 text-white bg-purple-600 rounded-full "
+                    className="w-full py-3 text-white bg-purple-600 rounded-full"
                   >
                     Signup
                   </Button>

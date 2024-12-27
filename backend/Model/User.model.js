@@ -17,6 +17,10 @@ const UserSchema = new mongoose.Schema({
         type: "String",
         required: false
     },
+    prfilesetup: {
+        type: "String",
+        default: false,
+    },
     color: {
         type: "String",
         required: false
