@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "@/Store/auth-slice";
 function Auth() {
   const navigate = useNavigate();
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -45,8 +48,11 @@ function Auth() {
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );
+      console.log(res);
       if (res) {
         toast.success(res.data.message || "Signup successful");
+        dispatch(setUser({ user: res.data.newUser }));
+
         navigate("/profile");
       }
     } catch (error) {

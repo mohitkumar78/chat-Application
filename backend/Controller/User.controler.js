@@ -75,7 +75,7 @@ export const login = async (req, res) => {
         const token = jwt.sign(
             { userid: user._id }, // Payload
             process.env.SECRET_KEY, // Secret Key
-            { expiresIn: '1d' } // Optional token expiration
+            { expiresIn: '15d' } // Optional token expiration
         );
 
         return res.status(200).json({
@@ -91,3 +91,35 @@ export const login = async (req, res) => {
         });
     }
 };
+
+export const getInfo = async (req, res) => {
+
+    const { firstname, lastname, image, profilesetup, color } = req.body
+
+    const userid = req.id;
+    if (!firstname || !lastname || !image || !profilesetup) {
+        return res.status(400).json({
+            message: "All field are required"
+        })
+    }
+    const user = await userdata.findByIdAndUpdate(userid, {
+        $set: {
+            firstname: firstname,
+            lastname: lastname,
+            image: image,
+            profilesetup: profilesetup,
+            color: color
+
+        },
+
+    }, {
+        new: true
+    })
+
+    console.log(user)
+    return res.status(200).json({
+        message: "user setup sucessfully",
+        user
+    })
+
+}

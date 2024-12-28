@@ -1,0 +1,34 @@
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+dotenv.config()
+const authentication = async (req, res, next) => {
+
+    try {
+        const { token } = req.body
+
+        if (!token) {
+            return res.status(404).json({
+                message: "Unauthorized token or token is not provided",
+                sucess: false
+            })
+        }
+
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
+
+        if (!decodedToken) {
+            return res.status(404).json({
+                message: "token is not verfied",
+                status: false
+            })
+        }
+
+        req.id = decodedToken.userid
+        next()
+
+    } catch (error) {
+        console.log("Error is Ocurr in Authorization")
+    }
+}
+
+export default authentication
