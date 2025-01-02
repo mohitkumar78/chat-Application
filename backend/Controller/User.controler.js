@@ -94,7 +94,7 @@ export const login = async (req, res) => {
 
 export const getInfo = async (req, res) => {
 
-    const { firstname, lastname, image, profilesetup, color } = req.body
+    const { firstname, lastname, image, prfilesetup, color } = req.body
 
     const userid = req.id;
     if (!firstname || !lastname || !image || !profilesetup) {
@@ -107,7 +107,7 @@ export const getInfo = async (req, res) => {
             firstname: firstname,
             lastname: lastname,
             image: image,
-            profilesetup: profilesetup,
+            prfilesetup: prfilesetup,
             color: color
 
         },

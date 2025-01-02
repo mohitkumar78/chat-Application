@@ -4,6 +4,9 @@ import Chat from "./Chats/chat";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import Profile from "./Auth/Profile";
+import CloudinaryUpload from "./Auth/Demo";
+import Login from "./Auth/Login";
+import Signup from "./Auth/Signup";
 function App() {
   return (
     <>
@@ -14,6 +17,9 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/upload" element={<CloudinaryUpload />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="*" element={<Navigate to="/auth" />} />
         </Routes>
       </BrowserRouter>
