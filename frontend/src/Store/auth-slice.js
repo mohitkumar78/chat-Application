@@ -16,11 +16,21 @@ const authSlice = createSlice({
             console.log(action.payload.user)
             console.log(state.user)
         },
+        updateUser: (state, action) => {
+            const updatedUsers = state.user.map((user) => {
+                if (user._id === action.payload.user._id) {
+                    return { ...user, ...action.payload.user };
+                }
+                return user;  // If no match, return the user as is
+            });
+            state.user = updatedUsers;  // Update the state with the modified array
+        }
+
     },
 });
 
 // Correctly export the setUser action
-export const { setUser } = authSlice.actions;
+export const { setUser, updateUser } = authSlice.actions;
 
 // Export the reducer
 export default authSlice.reducer;
