@@ -6,6 +6,7 @@ import { getColor } from "@/Utils/Utils";
 import { Input } from "@/components/ui/input";
 import { colors } from "../Utils/Utils.js";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Profile() {
@@ -15,7 +16,9 @@ function Profile() {
   const [selectedColor, setSelectedColor] = useState(0);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const color = getColor(selectedColor);
-  const { user } = useSelector((store) => store.auth);
+  const { user, token } = useSelector((store) => store.auth);
+  const naviagte = useNavigate();
+  console.log(token);
   console.log(user);
   const CLOUDINARY_URL =
     "https://api.cloudinary.com/v1_1/dcmtnw3ko/image/upload";
@@ -33,7 +36,7 @@ function Profile() {
           color,
           image: uploadedImageUrl,
           profileSetup: true,
-          token: user?.token,
+          token: token,
         },
         {
           headers: {
@@ -41,6 +44,8 @@ function Profile() {
           },
         }
       );
+      if (response.data) {
+      }
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error occurred while updating user:", error.message);
@@ -69,14 +74,14 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#1b1c24] via-[#2c2f3f] to-[#1b1c24] flex items-center justify-center p-5">
-      <div className="w-full max-w-xl bg-[#2d2e36] p-8 rounded-lg shadow-lg">
+      <div className="w-full max-w-xl p-8 rounded-lg shadow-lg">
         {/* Back Button */}
         <div className="flex justify-start mb-6">
           <IoArrowBack className="text-3xl cursor-pointer text-white hover:text-[#f03a17] transition-colors" />
         </div>
 
         {/* Profile Section */}
-        <div className="flex flex-col items-center gap-8 md:flex-row">
+        <div className="flex flex-col items-center gap-12 md:flex-row">
           {/* Avatar Section */}
           <div
             className="relative flex-shrink-0 w-40 h-40 md:w-48 md:h-48"

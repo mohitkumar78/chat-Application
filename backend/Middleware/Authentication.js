@@ -3,10 +3,10 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 const authentication = async (req, res, next) => {
-
+    console.log("req is comming for authentication")
     try {
         const { token } = req.body
-
+        console.log(token)
         if (!token) {
             return res.status(404).json({
                 message: "Unauthorized token or token is not provided",
@@ -22,7 +22,7 @@ const authentication = async (req, res, next) => {
                 status: false
             })
         }
-
+        console.log(decodedToken)
         req.id = decodedToken.userid
         next()
 

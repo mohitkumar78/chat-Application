@@ -21,9 +21,9 @@ const UserSchema = new mongoose.Schema({
         type: "String",
         required: false
     },
-    prfilesetup: {
+    profilesetup: {
         type: "String",
-        default: false,
+
     },
     color: {
         type: "String",
