@@ -7,6 +7,7 @@ import Profile from "./Auth/Profile";
 import CloudinaryUpload from "./Auth/Demo";
 import Login from "./Auth/Login";
 import Signup from "./Auth/Signup";
+import Chat_Container from "./Chats/Chat_Container";
 function App() {
   return (
     <>
@@ -20,6 +21,7 @@ function App() {
           <Route path="/upload" element={<CloudinaryUpload />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/chat-container" element={<Chat_Container />} />
           <Route path="*" element={<Navigate to="/auth" />} />
         </Routes>
       </BrowserRouter>

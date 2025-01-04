@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { colors } from "../Utils/Utils.js";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { updateUser } from "../Store/auth-slice";
 import axios from "axios";
 
 function Profile() {
@@ -45,6 +46,8 @@ function Profile() {
         }
       );
       if (response.data) {
+        updateUser({ user: response.user });
+        naviagte("/chat-container");
       }
       console.log("Response:", response.data);
     } catch (error) {
