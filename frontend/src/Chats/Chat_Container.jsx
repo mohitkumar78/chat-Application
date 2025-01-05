@@ -1,10 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
 
 function Chat_Container() {
-  const { user } = useSelector((store) => store.auth);
-  console.log(user.firstname);
-  return <div>Chat container</div>;
+  return (
+    <div className="fixed top-0 h-[100vj] w-[100vw] bg-[#1c1d25] flex flex-col md:static md:flex-1">
+      Chat container
+    </div>
+  );
 }
 
 export default Chat_Container;

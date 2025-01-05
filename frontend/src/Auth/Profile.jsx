@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { IoArrowBack } from "react-icons/io5";
 import { Avatar, AvatarImage } from "../components/ui/avatar";
 import { getColor } from "@/Utils/Utils";
@@ -11,6 +11,7 @@ import { updateUser } from "../Store/auth-slice";
 import axios from "axios";
 
 function Profile() {
+  const dispatch = useDispatch();
   const [hover, setHover] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState(""); // Fixed typo
@@ -46,8 +47,8 @@ function Profile() {
         }
       );
       if (response.data) {
-        updateUser({ user: response.user });
-        naviagte("/chat-container");
+        dispatch(updateUser({ user: response.data.user }));
+        naviagte("/chat");
       }
       console.log("Response:", response.data);
     } catch (error) {

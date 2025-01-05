@@ -17,16 +17,13 @@ const authSlice = createSlice({
             console.log(state.user)
         },
         updateUser: (state, action) => {
-            console.log(action.payload)
-            const updatedUsers = state.user.map((user) => {
-                if (user._id === action.payload.user._id) {
-                    return { ...user, ...action.payload.user };
-                }
-                return user;  // If no match, return the user as is
-            });
-            state.user = updatedUsers;
-            console.log(state.user) // Update the state with the modified array
-        }
+            console.log(action.payload);
+            if (state.user && state.user._id === action.payload.user._id) {
+                state.user = { ...state.user, ...action.payload.user };
+            }
+            console.log(state.user); // Updated user object
+        },
+
 
     },
 });
