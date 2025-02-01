@@ -23,13 +23,17 @@ const authSlice = createSlice({
             }
             console.log(state.user); // Updated user object
         },
+        logout: (state, action) => {
+            state.user = null,
+                state.token = ""
+        }
 
 
     },
 });
 
 // Correctly export the setUser action
-export const { setUser, updateUser } = authSlice.actions;
+export const { setUser, updateUser, logout } = authSlice.actions;
 
 // Export the reducer
 export default authSlice.reducer;
