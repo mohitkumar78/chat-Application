@@ -18,15 +18,17 @@ export const Contact = async (req, res) => {
         const sanitizedSearchTerm = searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         const regex = new RegExp(sanitizedSearchTerm, "i");
 
-        // Search for contacts, excluding the current user
-        const contacts = await userdata.find({
-            _id: { $ne: userId }, // Exclude the requesting user
-            $or: [
-                { firstname: regex },
-                { lastname: regex },
-                { email: regex }
-            ]
-        });
+        // Search for contacts, excluding the current user and selecting only necessary fields
+        const contacts = await userdata.find(
+            {
+                _id: { $ne: userId }, // Exclude the requesting user
+                $or: [
+                    { firstname: regex },
+                    { lastname: regex },
+                    { email: regex }
+                ]
+            }
+        ).select("firstname lastname email image"); // Exclude sensitive fields
 
         // Check if contacts exist
         if (contacts.length === 0) {

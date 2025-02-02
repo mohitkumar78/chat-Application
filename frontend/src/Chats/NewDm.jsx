@@ -17,13 +17,33 @@ import {
 } from "@/components/ui/tooltip";
 import { FaPlus } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 function NewDm() {
+  const { token } = useSelector((store) => store.auth);
   const [openNewContactModel, setOpenNewContactModel] = useState(false);
   const [searchContact, setSearchContact] = useState([]);
 
   const SearchContacts = async (searchTerm) => {
     // Add logic to fetch contacts based on searchTerm
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/users/contact",
+        {
+          token,
+          searchTerm,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log("error is occur in search contact", error);
+    }
   };
 
   return (
@@ -56,7 +76,6 @@ function NewDm() {
             <Input
               placeholder="Search Contact"
               className="w-full rounded-lg p-3 border border-[#2c2b3e] bg-[#2c2b3e] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              value={searchContact}
               onChange={(e) => SearchContacts(e.target.value)}
             />
           </div>
