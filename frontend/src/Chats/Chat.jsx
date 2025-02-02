@@ -22,7 +22,8 @@ function Chat() {
   return (
     <div className="flex h-[100vh] text-white overflow-hidden">
       <Chat_contact />
-      <Empty_Chat />
+      {/* <Empty_Chat />
+       */}
       <Chat_Container />
     </div>
   );
