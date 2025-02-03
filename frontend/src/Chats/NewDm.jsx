@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Lottie from "react-lottie";
 import { animationDefaultOption } from "../Utils/Utils.js";
+import { useDispatch } from "react-redux";
 import { getColor } from "../Utils/Utils.js";
 import {
   Dialog,
@@ -21,12 +22,20 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { ScrollArea } from "../components/ui/scroll-area.jsx";
-
+import { setChatType, setSelectedChatData } from "@/Store/contact-slice.js";
 function NewDm() {
+  const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
   const [openNewContactModel, setOpenNewContactModel] = useState(false);
   const [searchContact, setSearchContact] = useState([]);
-
+  const selectedContact = (contact) => {
+    console.log(contact);
+    if (!contact) return;
+    dispatch(setChatType({ chatType: "contact" }));
+    dispatch(setSelectedChatData({ contact }));
+    setOpenNewContactModel(false); // Close dialog
+    setSearchContact([]);
+  };
   const SearchContacts = async (searchTerm) => {
     try {
       const response = await axios.post(
@@ -89,6 +98,9 @@ function NewDm() {
                   <div
                     key={contact._id}
                     className="flex items-center gap-4 p-2 rounded-lg hover:bg-[#2c2b3e] transition-all duration-300 cursor-pointer"
+                    onClick={() => {
+                      selectedContact(contact);
+                    }}
                   >
                     <Avatar className="w-14 h-14 rounded-full shadow-lg border-4 border-[#f03a17] flex items-center justify-center bg-gray-700 overflow-hidden">
                       {contact?.image ? (
