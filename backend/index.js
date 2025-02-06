@@ -22,4 +22,5 @@ const server = app.listen(port, () => {
     console.log(`app is running on port no${port}`)
     connectdb()
 })
+scoketSetup(server);
 
