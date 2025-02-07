@@ -1,39 +1,65 @@
-import { Server as SocketIoServer } from "socket.io"; // Corrected typo
+import { Server as SocketIoServer } from "socket.io";
+import Message from "./Model/Message.model.js";
 
 const socketSetup = (server) => {
     const io = new SocketIoServer(server, {
         cors: {
-            origin: "http://localhost:5173", // Remove trailing slash
+            origin: "http://localhost:5173",
             methods: ["GET", "POST"],
-            credentials: true, // Corrected typo here
+            credentials: true,
         },
-    })
+    });
 
-    const disconnect = (scoket) => {
-        console.log(`Client Disconnected ${scoket.id}`)
+    const userSocketMap = new Map(); // ✅ Fixed variable typo
 
-        for (const [userid, scoketId] of userScoketMap.entries()) {
-            if (scoketId === scoket.id) {
-                userScoketMap.delete(userid);
-                break;
+    const sendMessage = async (message) => {
+        try {
+            console.log("✅ Received message:", message);
+            const senderSocketId = userSocketMap.get(message.sender);
+            const recipientSocketId = userSocketMap.get(message.recipient);
+
+            const createMessage = await Message.create(message);
+
+            const messageData = await Message.findById(createMessage._id)
+                .populate("sender", "_id email firstname lastname image color")
+                .populate("recipient", "_id email firstname lastname image color");
+
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit("receiveMessage", messageData); // ✅ Fixed typo
             }
+            if (senderSocketId) {
+                io.to(senderSocketId).emit("receiveMessage", messageData); // ✅ Fixed typo
+            }
+        } catch (error) {
+            console.error("❌ Error sending message:", error);
         }
-    }
-    const userScoketMap = new Map()
+    };
+
     io.on("connection", (socket) => {
-        const userid = socket.handshake.query.userId
+        const userId = socket.handshake.query.userId;
 
-        if (userid) {
-            userScoketMap.set(userid, socket.id)
-            console.log(`user ${userid} is connect with scoket id ${socket.id}`)
+        if (userId) {
+            userSocketMap.set(userId, socket.id);
+            console.log(`✅ User ${userId} connected with socket ID ${socket.id}`);
+        } else {
+            console.log("❌ User ID not provided during socket connection.");
         }
-        else {
-            console.log("userid is not provied during scoket connection")
-        }
-    })
 
-    io.on("disconnect", () => disconnect(scoket))
+        // ✅ Fix: Listen to "sendMessage" event inside the connection
+        socket.on("sendMessage", (message) => {
+            sendMessage(message);
+        });
 
+        socket.on("disconnect", () => {
+            console.log(`⚠️ Client Disconnected: ${socket.id}`);
+            for (const [userId, socketId] of userSocketMap.entries()) {
+                if (socketId === socket.id) {
+                    userSocketMap.delete(userId);
+                    break;
+                }
+            }
+        });
+    });
 };
 
 export default socketSetup;

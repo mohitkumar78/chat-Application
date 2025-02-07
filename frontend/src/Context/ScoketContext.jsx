@@ -1,8 +1,8 @@
 import { createContext, useContext, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { io } from "socket.io-client";
+import { setSelectedChatData } from "../Store/contact-slice";
 
-// Fix spelling mistake in the context name
 const SocketContext = createContext(null);
 
 export const useSocket = () => {
@@ -12,6 +12,10 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const socket = useRef(null);
   const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const { selectedchatType, selectedChatData } = useSelector(
+    (store) => store.contact
+  );
 
   useEffect(() => {
     if (user) {
@@ -21,16 +25,32 @@ export const SocketProvider = ({ children }) => {
       });
 
       socket.current.on("connect", () => {
-        console.log("Connected to socket server");
+        console.log("✅ Connected to socket server:", socket.current.id);
       });
+
+      // ✅ Fix typo: Use "receiveMessage" instead of "reciveMessage"
+      const handleMessage = (message) => {
+        console.log("✅ Message received on client:", message);
+        if (
+          selectedchatType !== undefined &&
+          selectedChatData &&
+          (selectedChatData._id === message.sender._id ||
+            selectedChatData._id === message.recipient._id)
+        ) {
+          dispatch(setSelectedChatData({ message }));
+        }
+      };
+
+      socket.current.on("receiveMessage", handleMessage); // ✅ Correct event name
 
       return () => {
         if (socket.current) {
+          socket.current.off("receiveMessage", handleMessage);
           socket.current.disconnect();
         }
       };
     }
-  }, [user]);
+  }, [user, dispatch, selectedchatType, selectedChatData]);
 
   return (
     <SocketContext.Provider value={socket.current}>

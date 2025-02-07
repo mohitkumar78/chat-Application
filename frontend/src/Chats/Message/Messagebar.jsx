@@ -3,19 +3,48 @@ import { GrAttachment } from "react-icons/gr";
 import { RiEmojiStickerLine } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
 import EmojiPicker from "emoji-picker-react";
+import { useSelector } from "react-redux";
+import { useSocket } from "../../Context/ScoketContext";
 
 function Messagebar() {
+  const { selectedchatType, selectedChatData } = useSelector(
+    (store) => store.contact
+  );
+  const { user } = useSelector((store) => store.auth);
   const emojiRef = useRef();
+  const socket = useSocket();
   const [message, setMessage] = useState("");
   const [emojiPicker, setEmojiPicker] = useState(false);
 
   const handleMessage = async () => {
-    console.log("Handle message:", message);
+    if (!message.trim()) return; // Prevent empty messages
+
+    console.log("🔌 Socket Instance:", socket);
+
+    if (!socket || !socket.connected) {
+      console.log("❌ Socket is not connected!");
+      return;
+    }
+
+    const messageData = {
+      sender: user._id,
+      content: message,
+      recipient: selectedChatData._id,
+      messageType: "text",
+      fileUrl: undefined,
+    };
+    console.log("📩 Sending message:", messageData);
+
+    if (selectedchatType === "contact") {
+      socket.emit("sendMessage", messageData);
+      setMessage(""); // Clear input field
+    }
   };
 
-  const handleEmoji = (emoji) => {
-    setMessage((msg) => msg + emoji.emoji);
+  const handleEmoji = (emojiObject) => {
+    setMessage((msg) => msg + emojiObject.emoji);
   };
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (emojiRef.current && !emojiRef.current.contains(event.target)) {
@@ -24,7 +53,6 @@ function Messagebar() {
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
