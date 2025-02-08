@@ -10,7 +10,7 @@ const socketSetup = (server) => {
         },
     });
 
-    const userSocketMap = new Map(); // ✅ Fixed variable typo
+    const userSocketMap = new Map();
 
     const sendMessage = async (message) => {
         try {
@@ -25,10 +25,10 @@ const socketSetup = (server) => {
                 .populate("recipient", "_id email firstname lastname image color");
 
             if (recipientSocketId) {
-                io.to(recipientSocketId).emit("receiveMessage", messageData); // ✅ Fixed typo
+                io.to(recipientSocketId).emit("receiveMessage", messageData);
             }
             if (senderSocketId) {
-                io.to(senderSocketId).emit("receiveMessage", messageData); // ✅ Fixed typo
+                io.to(senderSocketId).emit("receiveMessage", messageData);
             }
         } catch (error) {
             console.error("❌ Error sending message:", error);
@@ -45,10 +45,7 @@ const socketSetup = (server) => {
             console.log("❌ User ID not provided during socket connection.");
         }
 
-        // ✅ Fix: Listen to "sendMessage" event inside the connection
-        socket.on("sendMessage", (message) => {
-            sendMessage(message);
-        });
+        socket.on("sendMessage", (message) => sendMessage(message));
 
         socket.on("disconnect", () => {
             console.log(`⚠️ Client Disconnected: ${socket.id}`);

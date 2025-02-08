@@ -1,59 +1,56 @@
-import { createContext, useContext, useRef, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { createContext, useContext, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
-import { setSelectedChatData } from "../Store/contact-slice";
+import { setSelectedChat } from "@/Store/contact-slice";
 
 const SocketContext = createContext(null);
 
-export const useSocket = () => {
-  return useContext(SocketContext);
-};
+export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
-  const socket = useRef(null);
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
+  const socketRef = useRef(null);
   const { selectedchatType, selectedChatData } = useSelector(
     (store) => store.contact
   );
 
   useEffect(() => {
-    if (user) {
-      socket.current = io("http://localhost:4000", {
+    if (user && !socketRef.current) {
+      socketRef.current = io("http://localhost:4000", {
         withCredentials: true,
         query: { userId: user._id },
       });
 
-      socket.current.on("connect", () => {
-        console.log("✅ Connected to socket server:", socket.current.id);
+      socketRef.current.on("connect", () => {
+        console.log("✅ Connected to socket server:", socketRef.current.id);
       });
 
-      // ✅ Fix typo: Use "receiveMessage" instead of "reciveMessage"
-      const handleMessage = (message) => {
-        console.log("✅ Message received on client:", message);
+      socketRef.current.on("receiveMessage", (message) => {
+        console.log("📩 Message received:", message);
         if (
-          selectedchatType !== undefined &&
+          selectedchatType &&
           selectedChatData &&
           (selectedChatData._id === message.sender._id ||
             selectedChatData._id === message.recipient._id)
         ) {
-          dispatch(setSelectedChatData({ message }));
+          dispatch(setSelectedChat({ message }));
         }
-      };
+      });
 
-      socket.current.on("receiveMessage", handleMessage); // ✅ Correct event name
+      socketRef.current.on("disconnect", () => {
+        console.log("⚠️ Socket disconnected. Reconnecting...");
+        socketRef.current.connect();
+      });
 
       return () => {
-        if (socket.current) {
-          socket.current.off("receiveMessage", handleMessage);
-          socket.current.disconnect();
-        }
+        socketRef.current.disconnect();
       };
     }
-  }, [user, dispatch, selectedchatType, selectedChatData]);
+  }, [user, selectedchatType, selectedChatData, dispatch]);
 
   return (
-    <SocketContext.Provider value={socket.current}>
+    <SocketContext.Provider value={socketRef.current}>
       {children}
     </SocketContext.Provider>
   );

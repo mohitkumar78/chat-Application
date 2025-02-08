@@ -17,12 +17,11 @@ function Messagebar() {
   const [emojiPicker, setEmojiPicker] = useState(false);
 
   const handleMessage = async () => {
-    if (!message.trim()) return; // Prevent empty messages
-
-    console.log("🔌 Socket Instance:", socket);
+    if (!message.trim()) return;
 
     if (!socket || !socket.connected) {
-      console.log("❌ Socket is not connected!");
+      console.log("❌ Socket is not connected! Reconnecting...");
+      socket.connect(); // Reconnect if socket is disconnected
       return;
     }
 
@@ -33,16 +32,10 @@ function Messagebar() {
       messageType: "text",
       fileUrl: undefined,
     };
+
     console.log("📩 Sending message:", messageData);
-
-    if (selectedchatType === "contact") {
-      socket.emit("sendMessage", messageData);
-      setMessage(""); // Clear input field
-    }
-  };
-
-  const handleEmoji = (emojiObject) => {
-    setMessage((msg) => msg + emojiObject.emoji);
+    socket.emit("sendMessage", messageData);
+    setMessage(""); // Clear input field
   };
 
   useEffect(() => {
@@ -87,8 +80,9 @@ function Messagebar() {
           >
             <EmojiPicker
               theme="dark"
-              onEmojiClick={handleEmoji}
-              autoFocusSearch={false}
+              onEmojiClick={(emojiObject) =>
+                setMessage((msg) => msg + emojiObject.emoji)
+              }
             />
           </div>
         )}

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken'
 export const register = async (req, res) => {
     try {
-        console.log("req is come")
+
         const { email, password } = req.body;
         console.log(email, password)
         // Validate input
@@ -27,7 +27,7 @@ export const register = async (req, res) => {
 
         // Create new user
         const newUser = await userdata.create({ email, password: hashPassword });
-        console.log("new user", newUser)
+
         // Respond with success message
         return res.status(201).json({
             message: "User registered successfully.",
@@ -94,7 +94,7 @@ export const login = async (req, res) => {
 
 export const getInfo = async (req, res) => {
     try {
-        console.log(req.body);
+
 
         const { firstName, lastName, image, profileSetup, color } = req.body;
         const userid = req.id;
@@ -123,14 +123,14 @@ export const getInfo = async (req, res) => {
             { new: true }
         );
 
-        console.log("hello")
+
         if (!user) {
             return res.status(404).json({
                 message: "User not found",
             });
         }
 
-        console.log("updated user", user);
+
         return res.status(200).json({
             message: "User setup successfully",
             user,

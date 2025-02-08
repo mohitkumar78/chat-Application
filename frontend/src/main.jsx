@@ -5,7 +5,7 @@ import App from "./App.jsx";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./Store/Store.js";
-import { SocketProvider } from "./Context/ScoketContext";
+import { SocketProvider } from "./Context/ScoketContext.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>

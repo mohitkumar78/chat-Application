@@ -23,20 +23,23 @@ const contactSlice = createSlice({
             state.selectedChatData = null;
         },
         setSelectedChat: (state, action) => {
-            if (!state.selectedChatData) {
-                state.selectedChatData = [];
+            if (!state.selectedChatMessage) {
+                state.selectedChatMessage = [];
             }
 
-            state.selectedChatData.push({
-                ...action.payload.message,
-                recipient: state.selectedchatType === "channel"
-                    ? action.payload.message.recipient
-                    : action.payload.message.recipient._id,
-                sender: state.selectedchatType === "channel"
-                    ? action.payload.message.sender
-                    : action.payload.message.sender._id,
-            });
+            state.selectedChatMessage = [
+                ...state.selectedChatMessage,  // Spread existing messages
+                {
+                    recipient: state.selectedchatType === "channel"
+                        ? action.payload.message.recipient
+                        : action.payload.message.recipient?._id,
+                    sender: state.selectedchatType === "channel"
+                        ? action.payload.message.sender
+                        : action.payload.message.sender?._id,
+                }
+            ];
         }
+
     }
 });
 
