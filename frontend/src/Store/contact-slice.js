@@ -14,15 +14,35 @@ const contactSlice = createSlice({
             state.selectedchatType = action.payload.chatType;
         },
         setSelectedChatData: (state, action) => {
-            state.selectedChatData = action.payload;
-            state.selectedChatMessage = []; // Reset messages for new chat
+            state.selectedChatData = action.payload.contact;
         },
         closeChat: (state) => {
             state.selectedchatType = undefined;
             state.selectedChatData = null;
         },
         setSelectedChat: (state, action) => {
-            state.selectedChatMessage.push(action.payload);
+            console.log("chat sotre call")
+            if (!state.selectedChatMessage) {
+                state.selectedChatMessage = [];
+            }
+            console.log(action.payload.message)
+            state.selectedChatMessage = [
+                ...state.selectedChatMessage,
+                {
+                    content:
+                        state.selectedchatType === "contact"
+                            ? action.payload.message.content
+                            : "",
+                    recipient:
+                        state.selectedchatType === "channel"
+                            ? action.payload.message.recipient
+                            : action.payload.message.recipient?._id,
+                    sender:
+                        state.selectedchatType === "channel"
+                            ? action.payload.message.sender
+                            : action.payload.message.sender?._id,
+                },
+            ];
         },
     },
 });
