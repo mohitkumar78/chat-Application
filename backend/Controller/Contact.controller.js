@@ -1,5 +1,6 @@
 import userdata from "../Model/User.model.js"; // Ensure correct import path
-
+import Message from "../Model/Message.model.js";
+import mongoose from "mongoose";
 export const Contact = async (req, res) => {
     try {
         const { searchTerm } = req.body;
@@ -42,3 +43,77 @@ export const Contact = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+
+// Ensure correct import path
+
+
+export const getContactForDmList = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.id)) {
+            return res.status(400).json({ message: "Invalid User ID" });
+        }
+
+        let userId = new mongoose.Types.ObjectId(req.id);
+
+        // ✅ Fetch messages first (DEBUG STEP)
+
+
+        // ✅ Aggregation pipeline to group contacts
+        const contacts = await Message.aggregate([
+            {
+                $match: {
+                    $or: [{ sender: userId }, { recipient: userId }]
+                }
+            },
+            {
+                $sort: { timestamp: -1 }
+            },
+            {
+                $group: {
+                    _id: {
+                        $cond: {
+                            if: { $eq: ["$sender", userId] },
+                            then: "$recipient",
+                            else: "$sender"
+                        }
+                    },
+                    lastMessageTime: { $first: "$timestamp" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "userdatas",  // ✅ Changed from "userdata" to "userdatas"
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "ContactInfo"
+                }
+            },
+            {
+                $unwind: { path: "$ContactInfo", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    lastMessageTime: 1,
+                    email: "$ContactInfo.email",
+                    firstname: "$ContactInfo.firstname",
+                    lastname: "$ContactInfo.lastname",
+                    image: "$ContactInfo.image",
+                    color: "$ContactInfo.color"
+                }
+            },
+            {
+                $sort: { lastMessageTime: -1 }
+            }
+        ]).exec();
+
+        console.log("Final Contacts:", contacts);  // ✅ Debugging step
+
+        return res.status(200).json({ contacts });
+    } catch (error) {
+        console.error("Error fetching contacts:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+

@@ -2,11 +2,10 @@ import Message from "../Model/Message.model.js";
 
 export const getAllmessage = async (req, res) => {
     try {
-        console.log("request is comming for get all message")
+
         const sender = req.id;
         const { recipient } = req.body;
-        console.log(sender);
-        console.log(recipient);
+
         if (!sender || !recipient) {
             return res.status(404).json({
                 message: "sender and recipient is required",

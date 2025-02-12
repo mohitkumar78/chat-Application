@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     selectedchatType: undefined,
+    DirectMessagesContacts: [],
     selectedChatData: null,
     selectedChatMessage: [],
 };
@@ -48,8 +49,11 @@ const contactSlice = createSlice({
                 });
             }
         },
+        setDirectContactList: (state, action) => {
+            state.DirectMessagesContacts = action.payload.contacts
+        }
     },
 });
 
-export const { setChatType, setSelectedChatData, closeChat, setSelectedChat } = contactSlice.actions;
+export const { setChatType, setSelectedChatData, closeChat, setSelectedChat, setDirectContactList } = contactSlice.actions;
 export default contactSlice.reducer;
