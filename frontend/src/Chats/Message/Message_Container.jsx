@@ -1,44 +1,62 @@
 import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setSelectedChat } from "../../Store/contact-slice";
+import axios from "axios";
 
 function Message_Container() {
-  const { user } = useSelector((store) => store.auth); // Get logged-in user
-  const { selectedChatMessage, selectedChatData } = useSelector(
-    (store) => store.contact
-  );
+  const dispatch = useDispatch();
+  const { user, token } = useSelector((store) => store.auth);
+  const { selectedChatMessage, selectedChatData, selectedchatType } =
+    useSelector((store) => store.contact);
 
-  const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
-  const prevMessagesRef = useRef([]);
 
-  // Update messages when selectedChatMessage changes
   useEffect(() => {
-    if (
-      JSON.stringify(prevMessagesRef.current) !==
-      JSON.stringify(selectedChatMessage)
-    ) {
-      console.log("New messages received:", selectedChatMessage);
-      setMessages([...selectedChatMessage]);
-      prevMessagesRef.current = [...selectedChatMessage];
+    const getMessage = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/api/v1/message/getAllmessage",
+          { token, recipient: selectedChatData?._id },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        if (response.data.messages) {
+          console.log("Fetched messages from API:", response.data.messages);
+          dispatch(setSelectedChat({ message: response.data.messages })); // ✅ Send full array
+        }
+      } catch (error) {
+        console.log("Error in fetching message history:", error);
+      }
+    };
+
+    if (selectedChatData?._id && selectedchatType === "contact") {
+      getMessage();
     }
+  }, [selectedChatData, selectedchatType, token, dispatch]);
+
+  // ✅ Debug: Log messages when Redux state updates
+  useEffect(() => {
+    console.log("Updated selectedChatMessage in Redux:", selectedChatMessage);
   }, [selectedChatMessage]);
 
-  // Auto-scroll to the latest message
+  // ✅ Automatically scroll to the latest message
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [selectedChatMessage]);
 
   const renderMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) {
+    if (
+      !Array.isArray(selectedChatMessage) ||
+      selectedChatMessage.length === 0
+    ) {
       return <div className="text-center text-gray-500">No messages yet.</div>;
     }
 
     let lastDate = null;
-    return messages.map((message, index) => {
-      console.log("Rendering message:", message);
+    return selectedChatMessage.map((message, index) => {
       if (!message?.content) return null;
 
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
@@ -59,7 +77,7 @@ function Message_Container() {
   };
 
   const renderDmMessage = (message) => {
-    const isSender = message.sender === user?._id; // ✅ Correct sender check
+    const isSender = message.sender === user?._id;
 
     return (
       <div
@@ -68,8 +86,8 @@ function Message_Container() {
         <div
           className={`p-3 rounded-lg max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
             isSender
-              ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start" // Left for sender
-              : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end" // Right for receiver
+              ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
+              : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
           }`}
         >
           {message?.content}

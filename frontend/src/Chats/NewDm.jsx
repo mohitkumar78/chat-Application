@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarImage } from "../components/ui/avatar";
+
 import {
   Tooltip,
   TooltipContent,
@@ -33,6 +34,7 @@ function NewDm() {
     if (!contact) return;
     dispatch(setChatType({ chatType: "contact" }));
     dispatch(setSelectedChatData({ contact }));
+
     setOpenNewContactModel(false); // Close dialog
     setSearchContact([]);
   };
