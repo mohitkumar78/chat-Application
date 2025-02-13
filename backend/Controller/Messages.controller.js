@@ -1,5 +1,5 @@
 import Message from "../Model/Message.model.js";
-
+import { mkdirSync, renameSync } from "fs"
 export const getAllmessage = async (req, res) => {
     try {
 
@@ -22,6 +22,34 @@ export const getAllmessage = async (req, res) => {
                 messages
             })
         }
+    } catch (error) {
+        console.log("error is occur in getAllmessage", error)
+        res.status(404).json({
+            message: "Internal server error",
+            status: false
+        })
+    }
+}
+
+
+export const uploadFile = async (req, res) => {
+    try {
+
+        if (!req.file) {
+            return res.status(400).json({
+                message: "File is not send in req body"
+            })
+        }
+        const date = Date.now()
+        let fileDr = `uploads/files/${date}`
+        let filename = `${fileDr}/${req.file.orignalname}`
+
+        mkdirSync(fileDr, { recursive: true });
+        renameSync(req.file.path, filename)
+
+        return res.status(200).json({
+            filePath: filename
+        })
     } catch (error) {
         console.log("error is occur in getAllmessage", error)
         res.status(404).json({

@@ -15,6 +15,7 @@ app.use(express.json())
 app.use(express.urlencoded({
     extended: true
 }))
+app.use("/uploads/files", express.static("uploads/files"))
 app.use(cookieParser())
 app.use("/api/v1/user", userrouter);
 app.use("/api/v1/users", contactrouter);
