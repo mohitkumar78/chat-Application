@@ -6,14 +6,16 @@ import NewDm from "./NewDm";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setDirectContactList } from "../Store/contact-slice";
+import ContactList from "./ContactList";
+
 function Chat_contact() {
   const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
-
+  const { DirectMessagesContacts } = useSelector((store) => store.contact);
   useEffect(() => {
     const getContact = async () => {
       try {
-        const response = axios.post(
+        const response = await axios.post(
           "http://localhost:4000/api/v1/users/getcontacts-for-dm",
           {
             token,
@@ -24,10 +26,10 @@ function Chat_contact() {
             },
           }
         );
+        console.log(response.data.contacts);
         if (response) {
           dispatch(setDirectContactList({ contacts: response.data.contacts }));
         }
-        console.log(response);
       } catch (error) {
         console.log("error is occur in chat_contact", error);
       }
@@ -48,7 +50,9 @@ function Chat_contact() {
           <Title text="Direct Messages" />
           <NewDm />
         </div>
-        <div className="max-h-[38vh] scrollbar-hidden overflow-y-auto"></div>
+        <div className="max-h-[38vh] scrollbar-hidden overflow-y-auto">
+          <ContactList contacts={DirectMessagesContacts} />
+        </div>
       </div>
 
       {/* Channels Section */}
