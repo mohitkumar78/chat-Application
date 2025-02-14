@@ -5,5 +5,5 @@ import multer from 'multer'
 const Router = express.Router()
 const upload = multer({ dest: "uploads/files" })
 Router.route("/getAllmessage").post(authentication, getAllmessage);
-Router.route("upload-file").post(authentication, upload.single("file"), uploadFile)
+Router.route("/upload-file").post(authentication, upload.single("file"), uploadFile)
 export default Router;

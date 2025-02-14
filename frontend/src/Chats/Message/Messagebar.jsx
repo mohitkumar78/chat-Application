@@ -5,11 +5,13 @@ import { IoSend } from "react-icons/io5";
 import EmojiPicker from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { useSocket } from "../../Context/ScoketContext";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
 
 function Messagebar() {
-  const { selectedchatType, selectedChatData } = useSelector(
-    (store) => store.contact
-  );
+  const { selectedChatData } = useSelector((store) => store.contact);
+  const { token } = useSelector((store) => store.auth);
+  const fileref = useRef();
   const { user } = useSelector((store) => store.auth);
   const emojiRef = useRef();
   const socket = useSocket();
@@ -37,6 +39,39 @@ function Messagebar() {
     socket.emit("sendMessage", messageData);
     setMessage("");
   };
+  const handleFileAttacment = () => {
+    if (fileref.current) {
+      fileref.current.click();
+    }
+  };
+  const handleAttacmentChange = async (event) => {
+    try {
+      const file = event.target.files[0];
+
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("token", token); // ✅ Add token to formData
+
+        console.log("Sending token:", token); // Debugging
+
+        const response = await axios.post(
+          "http://localhost:4000/api/v1/message/upload-file",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`, // ✅ Add token to headers
+            },
+          }
+        );
+
+        console.log("File uploaded successfully:", response.data);
+      }
+    } catch (error) {
+      console.error("Error in file uploading", error);
+    }
+  };
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -54,10 +89,18 @@ function Messagebar() {
   return (
     <div className="h-[12vh] bg-[#1c1d25] flex justify-center items-center px-6 mb-6">
       <div className="relative w-full max-w-3xl flex bg-[#2a2b33] rounded-full items-center gap-3 px-6 py-4 shadow-lg border border-gray-600">
-        <button className="transition-all duration-300 text-neutral-400 hover:text-white focus:outline-none">
+        <button
+          className="transition-all duration-300 text-neutral-400 hover:text-white focus:outline-none"
+          onClick={handleFileAttacment}
+        >
           <GrAttachment className="text-2xl" />
         </button>
-
+        <Input
+          type="file"
+          className="hidden"
+          ref={fileref}
+          onChange={handleAttacmentChange}
+        />
         <input
           value={message}
           type="text"
@@ -70,7 +113,7 @@ function Messagebar() {
           className="relative transition-all duration-300 text-neutral-400 hover:text-white focus:outline-none"
           onClick={() => setEmojiPicker((prev) => !prev)}
         >
-          <RiEmojiStickerLine className="text-2xl" />
+          <RiEmojiStickerLine className="text-2xl" ref={fileref} />
         </button>
 
         {emojiPicker && (

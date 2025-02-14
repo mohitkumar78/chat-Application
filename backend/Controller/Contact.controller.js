@@ -108,7 +108,7 @@ export const getContactForDmList = async (req, res) => {
             }
         ]).exec();
 
-        console.log("Final Contacts:", contacts);  // ✅ Debugging step
+
 
         return res.status(200).json({ contacts });
     } catch (error) {
