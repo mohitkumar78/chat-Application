@@ -34,6 +34,8 @@ const contactSlice = createSlice({
                 state.selectedChatMessage = [
                     ...action.payload.message.map(msg => ({
                         content: msg.content,
+                        fileUrl: msg.fileUrl,
+                        messageType: msg.messageType,
                         recipient: msg.recipient?._id || msg.recipient,
                         sender: msg.sender?._id || msg.sender,
                         timestamp: msg.timestamp,
@@ -43,6 +45,8 @@ const contactSlice = createSlice({
                 console.log("Appending new message...");
                 state.selectedChatMessage.push({
                     content: action.payload.message.content,
+                    messageType: action.payload.message.messageType,
+                    fileUrl: action.payload.message.fileUrl,
                     recipient: action.payload.message.recipient?._id || action.payload.message.recipient,
                     sender: action.payload.message.sender?._id || action.payload.message.sender,
                     timestamp: action.payload.message.timestamp,

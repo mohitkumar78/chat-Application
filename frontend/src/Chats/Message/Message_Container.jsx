@@ -11,7 +11,10 @@ function Message_Container() {
     useSelector((store) => store.contact);
 
   const scrollRef = useRef();
-
+  const checkImage = (filePath) => {
+    const imageRegax = /\.(jpg|jpeg|png|bmp|tiff|webp|svg|ico|heic|hefif)$/i;
+    return imageRegax.test(filePath);
+  };
   useEffect(() => {
     const getMessage = async () => {
       try {
@@ -56,9 +59,9 @@ function Message_Container() {
     }
 
     let lastDate = null;
+    console.log(selectedChatMessage);
     return selectedChatMessage.map((message, index) => {
-      if (!message?.content) return null;
-
+      console.log(message);
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
@@ -78,23 +81,46 @@ function Message_Container() {
 
   const renderDmMessage = (message) => {
     const isSender = message.sender === user?._id;
-
+    console.log(message);
     return (
       <div
         className={`flex my-2 ${isSender ? "justify-start" : "justify-end"}`}
       >
-        <div
-          className={`p-3 rounded-lg max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
-            isSender
-              ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
-              : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
-          }`}
-        >
-          {message?.content}
-          <div className="mt-1 text-xs text-gray-400">
-            {moment(message?.timestamp).format("LT")}
+        {message.messageType === "text" && (
+          <div
+            className={`p-3 rounded-lg max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
+              isSender
+                ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
+                : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
+            }`}
+          >
+            {message?.content}
+            <div className="mt-1 text-xs text-gray-400">
+              {moment(message?.timestamp).format("LT")}
+            </div>
           </div>
-        </div>
+        )}
+
+        {message.messageType === "file" && (
+          <div
+            className={`p-3 rounded-lg max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
+              isSender
+                ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
+                : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
+            }`}
+          >
+            {checkImage(message.fileUrl) && (
+              <div className="cursor-pointer">
+                <img
+                  src={`http://localhost:4000/${message.fileUrl}`}
+                  alt="Uploaded file"
+                  height={300}
+                  width={300}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   };
