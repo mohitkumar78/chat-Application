@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 
 function Messagebar() {
-  const { selectedChatData } = useSelector((store) => store.contact);
+  const { selectedChatData, selectedchatType } = useSelector(
+    (store) => store.contact
+  );
   const { token } = useSelector((store) => store.auth);
   const fileref = useRef();
   const { user } = useSelector((store) => store.auth);
@@ -66,7 +68,19 @@ function Messagebar() {
           }
         );
 
-        console.log("File uploaded successfully:", response.data);
+        console.log("File uploaded successfully:", response.data.filePath);
+        if (response.status === 200 && response.data) {
+          if (selectedchatType === "contact") {
+            const messageData = {
+              sender: user._id,
+              content: undefined,
+              recipient: selectedChatData._id,
+              messageType: "file",
+              fileUrl: response.data.filePath,
+            };
+            socket.emit("sendMessage", messageData);
+          }
+        }
       }
     } catch (error) {
       console.error("Error in file uploading", error);
