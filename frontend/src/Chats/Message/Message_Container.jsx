@@ -2,6 +2,9 @@ import moment from "moment";
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedChat } from "../../Store/contact-slice";
+import { MdFolderZip } from "react-icons/md";
+import { IoMdArrowRoundDown } from "react-icons/io";
+
 import axios from "axios";
 
 function Message_Container() {
@@ -15,6 +18,7 @@ function Message_Container() {
     const imageRegax = /\.(jpg|jpeg|png|bmp|tiff|webp|svg|ico|heic|hefif)$/i;
     return imageRegax.test(filePath);
   };
+
   useEffect(() => {
     const getMessage = async () => {
       try {
@@ -26,7 +30,7 @@ function Message_Container() {
 
         if (response.data.messages) {
           console.log("Fetched messages from API:", response.data.messages);
-          dispatch(setSelectedChat({ message: response.data.messages })); // ✅ Send full array
+          dispatch(setSelectedChat({ message: response.data.messages }));
         }
       } catch (error) {
         console.log("Error in fetching message history:", error);
@@ -38,17 +42,31 @@ function Message_Container() {
     }
   }, [selectedChatData, selectedchatType, token, dispatch]);
 
-  // ✅ Debug: Log messages when Redux state updates
-  useEffect(() => {
-    console.log("Updated selectedChatMessage in Redux:", selectedChatMessage);
-  }, [selectedChatMessage]);
-
-  // ✅ Automatically scroll to the latest message
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedChatMessage]);
+  const FileDownload = async (url) => {
+    try {
+      const response = await fetch(`http://localhost:4000/${url}`);
+      if (!response.ok) throw new Error("Failed to fetch file");
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = url.split("/").pop(); // Extracting filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
 
   const renderMessage = () => {
     if (
@@ -59,9 +77,7 @@ function Message_Container() {
     }
 
     let lastDate = null;
-    console.log(selectedChatMessage);
     return selectedChatMessage.map((message, index) => {
-      console.log(message);
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
@@ -81,14 +97,16 @@ function Message_Container() {
 
   const renderDmMessage = (message) => {
     const isSender = message.sender === user?._id;
-    console.log(message);
+
     return (
       <div
-        className={`flex my-2 ${isSender ? "justify-start" : "justify-end"}`}
+        className={`flex my-2 ${
+          isSender ? "justify-start" : "justify-end"
+        } px-2`}
       >
         {message.messageType === "text" && (
           <div
-            className={`p-3 rounded-lg max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
+            className={`p-3 rounded-lg max-w-[80%] sm:max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
               isSender
                 ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
                 : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
@@ -103,20 +121,34 @@ function Message_Container() {
 
         {message.messageType === "file" && (
           <div
-            className={`p-3 rounded-lg max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
+            className={`p-3 rounded-lg max-w-[80%] sm:max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
               isSender
                 ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
                 : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
             }`}
           >
-            {checkImage(message.fileUrl) && (
+            {checkImage(message.fileUrl) ? (
               <div className="cursor-pointer">
                 <img
                   src={`http://localhost:4000/${message.fileUrl}`}
                   alt="Uploaded file"
-                  height={300}
-                  width={300}
+                  className="w-full max-w-[300px] h-auto rounded-md"
                 />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <span className="p-3 text-3xl rounded-full text-white/80 bg-black/20">
+                  <MdFolderZip />
+                </span>
+                <span className="block mt-1 text-sm">
+                  {message.fileUrl.split("/").pop()}
+                </span>
+                <span
+                  className="p-3 text-3xl transition-all duration-300 rounded-full cursor-pointer bg-black/20 hover:bg-black/50"
+                  onClick={FileDownload(message.fileUrl)}
+                >
+                  <IoMdArrowRoundDown />
+                </span>
               </div>
             )}
           </div>
@@ -126,7 +158,7 @@ function Message_Container() {
   };
 
   return (
-    <div className="flex-1 w-full p-4 px-8 overflow-y-auto">
+    <div className="flex-1 w-full p-4 px-4 sm:px-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
       {renderMessage()}
       <div ref={scrollRef}></div>
     </div>
