@@ -1,14 +1,17 @@
 import moment from "moment";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedChat } from "../../Store/contact-slice";
 import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowRoundDown } from "react-icons/io";
 
 import axios from "axios";
+import { IoCloseSharp } from "react-icons/io5";
 
 function Message_Container() {
   const dispatch = useDispatch();
+  const [showImage, setShowImage] = useState(false);
+  const [ImageUrl, setImageUrl] = useState(null);
   const { user, token } = useSelector((store) => store.auth);
   const { selectedChatMessage, selectedChatData, selectedchatType } =
     useSelector((store) => store.contact);
@@ -123,16 +126,22 @@ function Message_Container() {
           <div
             className={`p-3 rounded-lg max-w-[80%] sm:max-w-[60%] break-words shadow-md transition-all transform scale-95 hover:scale-100 ${
               isSender
-                ? "bg-[#8417ff] text-white border border-[#6b11cc] self-start"
+                ? "bg-[#8417ff]/50 text-white border border-solid self-start"
                 : "bg-[#2a2b33] text-white border border-[#ffffff]/20 self-end"
             }`}
           >
             {checkImage(message.fileUrl) ? (
-              <div className="cursor-pointer">
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  setImageUrl(message.fileUrl);
+                  setShowImage(true);
+                }}
+              >
                 <img
                   src={`http://localhost:4000/${message.fileUrl}`}
                   alt="Uploaded file"
-                  className="w-full max-w-[300px] h-auto rounded-md"
+                  className="w-full max-w-[300px] bg-cover h-auto rounded-md"
                 />
               </div>
             ) : (
@@ -145,7 +154,7 @@ function Message_Container() {
                 </span>
                 <span
                   className="p-3 text-3xl transition-all duration-300 rounded-full cursor-pointer bg-black/20 hover:bg-black/50"
-                  onClick={FileDownload(message.fileUrl)}
+                  onClick={() => FileDownload(message.fileUrl)}
                 >
                   <IoMdArrowRoundDown />
                 </span>
@@ -161,6 +170,36 @@ function Message_Container() {
     <div className="flex-1 w-full p-4 px-4 sm:px-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
       {renderMessage()}
       <div ref={scrollRef}></div>
+      {showImage && (
+        <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
+          <div>
+            <img
+              src={`http://localhost:4000/${ImageUrl}`}
+              alt="Uploaded file"
+              className="h-[80vh] w-full bg-cover"
+            />
+          </div>
+          <div className="top-0 flex gap-4 mt-6">
+            <button
+              className="p-3 text-3xl transition-all duration-300 rounded-full cursor-pointer bg-black/20 hover:bg-black/50"
+              onClick={() => {
+                FileDownload(ImageUrl);
+              }}
+            >
+              <IoMdArrowRoundDown />
+            </button>
+            <button
+              className="p-3 text-3xl transition-all duration-300 rounded-full cursor-pointer bg-black/20 hover:bg-black/50"
+              onClick={() => {
+                setShowImage(false);
+                setImageUrl(null);
+              }}
+            >
+              <IoCloseSharp />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
