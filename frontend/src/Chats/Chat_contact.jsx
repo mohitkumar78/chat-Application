@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setDirectContactList } from "../Store/contact-slice";
 import ContactList from "./ContactList";
-
+import CreateChannel from "./CreatateChannel/CreateChaneel";
 function Chat_contact() {
   const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
@@ -57,8 +57,9 @@ function Chat_contact() {
 
       {/* Channels Section */}
       <div className="px-5 mt-5">
-        <div className="flex items-center justify-start">
-          <Title text="Channels" />
+        <div className="flex items-center justify-between">
+          <Title text="Create Channels" />
+          <CreateChannel />
         </div>
       </div>
 

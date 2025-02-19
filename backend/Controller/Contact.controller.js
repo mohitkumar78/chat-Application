@@ -117,3 +117,30 @@ export const getContactForDmList = async (req, res) => {
     }
 };
 
+
+
+export const getAllContact = async (req, res) => {
+    try {
+        if (!req.id) {
+            return res.status(400).json({ message: "User ID not provided", success: false });
+        }
+
+        const users = await userdata.find({ _id: { $ne: req.id } }, "firstname lastname _id email");
+
+        const contacts = users.map((user) => ({
+            label: user?.firstname && user?.lastname ? `${user.firstname} ${user.lastname}` : user?.email,
+            id: user._id, // Adding _id for better identification
+        }));
+
+        return res.status(200).json({
+            contacts,
+            success: true,
+        });
+    } catch (error) {
+        console.error("Error occurred in getAllContact:", error);
+        res.status(500).json({
+            message: "Internal server error",
+            success: false,
+        });
+    }
+};
