@@ -5,7 +5,7 @@ const ChannelScema = new mongoose.Schema({
         type: "String",
         required: true
     },
-    member: [{
+    members: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "userdata",
         required: true
