@@ -129,7 +129,7 @@ export const getAllContact = async (req, res) => {
 
         const contacts = users.map((user) => ({
             label: user?.firstname && user?.lastname ? `${user.firstname} ${user.lastname}` : user?.email,
-            id: user._id, // Adding _id for better identification
+            value: user._id, // Adding _id for better identification
         }));
 
         return res.status(200).json({
