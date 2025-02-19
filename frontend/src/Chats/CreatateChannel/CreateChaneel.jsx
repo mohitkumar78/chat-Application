@@ -22,7 +22,7 @@ function CreateChannel() {
   const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
   const [openNewChannelModel, setOpenNewChannelModel] = useState(false);
-  const [allOptions, setAllOptions] = useState([]); // Store original list
+  const [allOptions, setAllOptions] = useState([]); // Store all contacts
   const [selectedOptions, setSelectedOptions] = useState([]); // Selected contacts
   const [channelName, setChannelName] = useState("");
 
@@ -85,7 +85,7 @@ function CreateChannel() {
           <div className="mt-4">
             <Input
               placeholder="Enter Channel Name"
-              className="w-full rounded-lg px-4 py-3 border border-[#2c2b3e] bg-[#2c2b3e] text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 transition-all duration-200"
+              className="w-full rounded-lg px-4 py-3 border border-gray-600 bg-[#2c2b3e] text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 transition-all duration-200"
               onChange={(e) => setChannelName(e.target.value)}
               value={channelName}
             />
@@ -104,18 +104,18 @@ function CreateChannel() {
                 control: (base) => ({
                   ...base,
                   backgroundColor: "#2c2b3e",
-                  borderColor: "#2c2b3e",
+                  borderColor: "#4a4a6a",
                   color: "white",
                   padding: "5px",
                 }),
                 menu: (base) => ({
                   ...base,
-                  backgroundColor: "#2c2b3e",
+                  backgroundColor: "#3a3b4d",
                 }),
                 option: (base, { isFocused, isSelected }) => ({
                   ...base,
                   backgroundColor: isSelected
-                    ? "#4a4b5e"
+                    ? "#7b2cbf"
                     : isFocused
                     ? "#3a3b4d"
                     : "#2c2b3e",
@@ -123,7 +123,7 @@ function CreateChannel() {
                 }),
                 multiValue: (base) => ({
                   ...base,
-                  backgroundColor: "#3a3b4d",
+                  backgroundColor: "#7b2cbf", // Purple for selected items
                   borderRadius: "5px",
                   padding: "3px",
                 }),
@@ -135,7 +135,7 @@ function CreateChannel() {
                 }),
                 multiValueRemove: (base) => ({
                   ...base,
-                  color: "red",
+                  color: "white",
                   cursor: "pointer",
                   ":hover": { backgroundColor: "darkred", color: "white" },
                 }),
@@ -148,11 +148,11 @@ function CreateChannel() {
             {selectedOptions.map((option) => (
               <div
                 key={option.value}
-                className="flex items-center justify-between px-3 py-2 mb-2 text-white bg-gray-800 rounded-md"
+                className="flex items-center justify-between px-3 py-2 mb-2 text-white bg-gray-900 rounded-md"
               >
                 <span>{option.label}</span>
                 <FaTimes
-                  className="text-red-500 cursor-pointer hover:text-red-700"
+                  className="text-red-400 cursor-pointer hover:text-red-600"
                   onClick={() => removeSelectedOption(option)}
                 />
               </div>
