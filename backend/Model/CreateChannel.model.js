@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-const ChannelScema = new mongoose.Schema({
+const ChannelSchema = new mongoose.Schema({
     name: {
-        type: "String",
+        type: String, // Fixed: Removed quotes
         required: true
     },
     members: [{
@@ -21,23 +21,27 @@ const ChannelScema = new mongoose.Schema({
     }],
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     updatedAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     }
+});
 
-})
+// Middleware to update 'updatedAt' before saving
+ChannelSchema.pre("save", function (next) {
+    this.updatedAt = Date.now();
+    next();
+});
 
-ChannelScema.pre("save", function (next) {
-    this.updatedAt = Date.now()
-    next()
-})
-ChannelScema.pre("findOneAndUpdate", function (next) {
-    this.set({ updatedAt: Date.now() })
-    next()
-})
+// Middleware to update 'updatedAt' before updating
+ChannelSchema.pre("findOneAndUpdate", function (next) {
+    this.set({ updatedAt: Date.now() });
+    next();
+});
 
-const Channel = mongoose.Model("Channels", ChannelScema);
+// Fixed: mongoose.model instead of mongoose.Model
+const Channel = mongoose.model("Channels", ChannelSchema);
+
 export default Channel;
