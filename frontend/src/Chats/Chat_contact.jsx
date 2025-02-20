@@ -8,6 +8,8 @@ import axios from "axios";
 import { setDirectContactList } from "../Store/contact-slice";
 import ContactList from "./ContactList";
 import CreateChannel from "./CreatateChannel/CreateChaneel";
+import { setChannel } from "@/Store/channel-slice";
+import ChannelList from "./CreatateChannel/ChannelList";
 function Chat_contact() {
   const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
@@ -35,8 +37,31 @@ function Chat_contact() {
         console.log("error is occur in chat_contact", error);
       }
     };
+    const getAllUserChannel = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/api/v1/channels/getAllUserChannel",
+          {
+            token,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response) {
+          console.log(response);
+          dispatch(setChannel({ Channel: response.data.Channels }));
+        }
+      } catch (error) {
+        console.log("Error is Occur while fetching all channel");
+      }
+    };
+    getAllUserChannel();
     getContact();
-  }, []);
+  }, [setDirectContactList, setChannel]);
 
   return (
     <div className="relative w-full md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r border-[#2f303b] h-screen flex flex-col">
@@ -63,7 +88,7 @@ function Chat_contact() {
           <CreateChannel />
         </div>
         <div className="max-h-[38vh] scrollbar-hidden overflow-y-auto">
-          <ContactList contacts={DirectMessagesContacts} />
+          <ChannelList />
         </div>
       </div>
 

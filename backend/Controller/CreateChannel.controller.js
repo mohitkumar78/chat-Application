@@ -45,7 +45,7 @@ export const getAllUserChannel = async (req, res) => {
 
         const Channels = await Channel.find({
             $or: [{ admin: userId }, { members: userId }]
-        })
+        }).sort({ updatedAt: -1 })
 
         if (!Channels) {
             return res.status(400).send("No any Channel is found");

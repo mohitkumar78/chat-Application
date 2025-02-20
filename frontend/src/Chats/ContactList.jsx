@@ -7,10 +7,10 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
-function ContactList({ contacts, ischannel = false }) {
+function ContactList({ contacts = [], ischannel = false }) {
   const dispatch = useDispatch();
   const { selectedChatData } = useSelector((store) => store.contact);
-
+  console.log(contacts);
   const handleClick = (contact) => {
     if (ischannel) {
       dispatch(setChatType({ chatType: "channel" }));
@@ -26,7 +26,7 @@ function ContactList({ contacts, ischannel = false }) {
 
   return (
     <div className="w-full max-w-lg mx-auto mt-5 overflow-hidden">
-      {contacts.length > 0 ? (
+      {contacts && contacts.length > 0 ? (
         contacts.map((contact) => (
           <div
             key={contact._id}
