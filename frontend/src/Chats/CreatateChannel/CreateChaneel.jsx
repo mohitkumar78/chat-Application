@@ -17,7 +17,7 @@ import {
 import Select from "react-select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { addChannel } from "@/Store/channel-slice";
 function CreateChannel() {
   const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
@@ -41,7 +41,33 @@ function CreateChannel() {
     };
     getAllContact();
   }, [token]);
-
+  const createChannel = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/channels/channel",
+        {
+          name: channelName,
+          members: selectedOptions.map((opt) => opt.value),
+          token,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+      if (response) {
+        setAllOptions([]);
+        setSelectedOptions([]);
+        setChannelName("");
+        dispatch(addChannel({ Channel: response.data.Channel }));
+        setOpenNewChannelModel(false);
+      }
+    } catch (error) {
+      console.log("Error is Occur while creating a Channel", error);
+    }
+  };
   // Handle selection of contacts
   const handleChange = (selected) => {
     setSelectedOptions(selected);
@@ -163,9 +189,7 @@ function CreateChannel() {
           <div className="mt-6">
             <Button
               className="w-full py-3 text-lg font-semibold text-white transition-all duration-300 bg-purple-700 rounded-lg shadow-md hover:bg-purple-600 active:bg-purple-800"
-              onClick={() =>
-                console.log("Channel Created:", channelName, selectedOptions)
-              }
+              onClick={() => createChannel()}
             >
               Create Channel
             </Button>

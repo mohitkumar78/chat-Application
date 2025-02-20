@@ -12,6 +12,7 @@ function Chat_contact() {
   const dispatch = useDispatch();
   const { token } = useSelector((store) => store.auth);
   const { DirectMessagesContacts } = useSelector((store) => store.contact);
+  const { channels } = useSelector((store) => store.channel);
   useEffect(() => {
     const getContact = async () => {
       try {
@@ -60,6 +61,9 @@ function Chat_contact() {
         <div className="flex items-center justify-between">
           <Title text="Create Channels" />
           <CreateChannel />
+        </div>
+        <div className="max-h-[38vh] scrollbar-hidden overflow-y-auto">
+          <ContactList contacts={DirectMessagesContacts} />
         </div>
       </div>
 
